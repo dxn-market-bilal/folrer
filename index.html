@@ -1,64 +1,239 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-  <base target="_top">
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #121824; color: white; padding: 50px; }
-    .upload-box { border: 2px dashed #3b82f6; padding: 40px; border-radius: 10px; display: inline-block; }
-    button { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px; }
-    #downloadArea { margin-top: 30px; display: none; }
-    .btn-download { background: #10b981; padding: 12px 25px; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
-    #loader { display: none; color: #f59e0b; margin-top: 15px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملفاتي السحابية | MyCloud</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; font-size: 24px; color: var(--accent); }
+        
+        /* منطقة الرفع */
+        .upload-section {
+            background-color: var(--bg-card);
+            border: 2px dashed #475569;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .upload-section:hover { border-color: var(--accent); }
+        .upload-btn {
+            background-color: var(--accent);
+            color: #0f172a;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #fileInput { display: none; }
+
+        /* شبكة عرض الملفات */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .file-card {
+            background-color: var(--bg-card);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #334155;
+            position: relative;
+            overflow: hidden;
+        }
+        .file-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+        .file-name {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+        .file-size {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+        }
+        .preview-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .view-link {
+            display: inline-block;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid var(--accent);
+            padding: 5px 12px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .view-link:hover {
+            background-color: var(--accent);
+            color: #0f172a;
+        }
+        .status-msg {
+            color: #34d399;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
-  <h2>مترجم المستندات الفوري 🚀</h2>
-  <p>ارفع ملفك المكتوب بالإنكليزية لتحصل على نسخة مدمجة (صفحة إنكليزي / صفحة عربي)</p>
+<div class="container">
+    <header>
+        <h1>☁️ MyCloud الأسطوري</h1>
+        <div id="globalStatus" class="status-msg">جاري تحميل ملفاتك السحابية...</div>
+    </header>
 
-  <div class="upload-box">
-    <input type="file" id="userFile" accept="image/*,application/pdf"><br>
-    <button onclick="startTranslation()">ترجم الملف الآن</button>
-    <div id="loader">جاري المعالجة والترجمة... يرجى الانتظار ⏳</div>
-  </div>
+    <!-- صندوق إسقاط ورفع الملفات -->
+    <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+        <div class="file-icon">📤</div>
+        <p>اضغط هنا لاختيار أي ملف من جهازك (صور، صوت، فيديو، مستندات)</p>
+        <input type="file" id="fileInput" onchange="handleFileUpload(this)">
+    </div>
 
-  <div id="downloadArea">
-    <a id="downloadLink" class="btn-download" href="#" target="_blank">لتحميل الملف المترجم اضغط هنا 📥</a>
-  </div>
+    <!-- شبكة عرض الملفات المرفوعة فعلياً -->
+    <h2>🗂️ المجلد الرئيسي وملفاتك المرفوعة</h2>
+    <div class="files-grid" id="filesContainer">
+        <!-- الملفات الحقيقية راح تنبني هنا تلقائياً عبر الجافا سكربت -->
+    </div>
+</div>
 
-  <script>
-    function startTranslation() {
-      const fileInput = document.getElementById('userFile');
-      if (fileInput.files.length === 0) {
-        alert("الرجاء اختيار ملف أولاً!");
-        return;
-      }
+<script>
+    // 🛑 ضع رابط الـ Web App اللّي نسخته من غوغل سكربت هنا بالملي مكان علامات الاستفهام
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlbMj73l1_qhJT6hdDIWca0wa_GQqMWeSBhdFeatzQC-H3rPGFJ5hoMsmawhGLfabxnw/exec";
 
-      document.getElementById('loader').style.display = 'block';
-      document.getElementById('downloadArea').style.display = 'none';
+    // أول ما يفتح الموقع يروح يجيب الملفات المخزنة بالغوغل درايف مالتك
+    window.onload = loadFiles;
 
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      
-      reader.onload = function(e) {
-        const bytes = e.target.result.split(',')[1]; // تحويل الملف لـ Base64 ليرسل لغوغل
+    function loadFiles() {
+        document.getElementById('globalStatus').innerText = "جاري تحديث السحابة... 🔄";
         
-        // استدعاء دالة غوغل بالخلفية
-        google.script.run
-          .withSuccessHandler(function(downloadUrl) {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('downloadLink').href = downloadUrl;
-            document.getElementById('downloadArea').style.display = 'block';
-          })
-          .withFailureHandler(function(err) {
-            alert("حدث خطأ أثناء الترجمة: " + err);
-            document.getElementById('loader').style.display = 'none';
-          })
-          .processFile(bytes, file.name, file.type);
-      };
-      
-      reader.readAsDataURL(file);
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getFiles" })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "success") {
+                renderFiles(data.files);
+                document.getElementById('globalStatus').innerText = "السحابة متزامنة ومحدثة ✅";
+            } else {
+                document.getElementById('globalStatus').innerText = "فشل في جلب البيانات ❌";
+            }
+        }).catch(err => {
+            document.getElementById('globalStatus').innerText = "خطأ في الاتصال بالسيرفر";
+        });
     }
-  </script>
+
+    function handleFileUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        document.getElementById('globalStatus').innerText = "جاري تشفير ورفع الملف لغوغل درايف... ⏳";
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const payload = {
+                action: "upload",
+                base64: e.target.result,
+                fileName: file.name,
+                mimeType: file.type
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    document.getElementById('globalStatus').innerText = "تم الرفع والربط بنجاح! 🎉";
+                    loadFiles(); // إعادة تحميل الشبكة علمود يظهر الملف الجديد فوراً
+                } else {
+                    alert("فشل الرفع: " + data.message);
+                }
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function renderFiles(files) {
+        const container = document.getElementById('filesContainer');
+        container.innerHTML = ""; // تصفية الواجهة القديمة
+
+        if(files.length === 0) {
+            container.innerHTML = "<p style='color: var(--text-sub)'>المجلد فارغ حالياً، ابدأ برفع أول ملف!</p>";
+            return;
+        }
+
+        files.forEach(file => {
+            const card = document.createElement('div');
+            card.className = 'file-card';
+
+            let previewHTML = "";
+            // فرز ذكي: إذا الملف صورة، نعرضها كـ Thumbnail حقيقي كدام العين
+            if(file.mimeType.includes("image")) {
+                // تحويل الرابط لرابط عرض مباشر متوافق مع الويب
+                let directImg = `https://lh3.googleusercontent.com/d/${file.id}`;
+                previewHTML = `<img src="${directImg}" class="preview-img" onerror="this.src='https://placehold.co/200?text=🖼️'">`;
+            } else if(file.mimeType.includes("audio")) {
+                previewHTML = `<div class="file-icon">🎵</div>`;
+            } else if(file.mimeType.includes("video")) {
+                previewHTML = `<div class="file-icon">🎬</div>`;
+            } else {
+                previewHTML = `<div class="file-icon">📄</div>`;
+            }
+
+            card.innerHTML = `
+                ${previewHTML}
+                <div class="file-name" title="${file.name}">${file.name}</div>
+                <div class="file-size">${file.size}</div>
+                <a href="${file.url}" target="_blank" class="view-link">فتح واستعراض</a>
+            `;
+            container.appendChild(card);
+        });
+    }
+</script>
 </body>
 </html>
