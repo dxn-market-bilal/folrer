@@ -3,116 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظم الألبومات الذكي</title>
-    <!-- Tailwind CSS لتصميم عصري وخيالي -->
+    <title>ملفاتي - المنظم الذكي</title>
+    <!-- Tailwind CSS لتصميم Material Design 3 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- مكتبة أيقونات FontAwesome -->
+    <!-- مكتبة أيقونات FontAwesome المحدثة -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: #f8fafd;
+            color: #1f1f1f;
+        }
+        .google-card {
+            background-color: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+        .category-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .category-btn:active {
+            transform: scale(0.9);
         }
     </style>
 </head>
-<body class="min-h-screen pb-10">
+<body class="min-h-screen pb-24">
 
-    <!-- شريط العنوان -->
-    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50 px-4 py-4 shadow-lg">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold flex items-center gap-2 text-emerald-400">
-                <i class="fa-solid fa-folder-tree text-2xl"></i>
-                <span>ألبوماتي الذكية</span>
-            </h1>
-            <button onclick="openNewAlbumModal()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-4 py-2 rounded-full text-sm transition-all shadow-lg flex items-center gap-1">
-                <i class="fa-solid fa-plus"></i> ألبوم جديد
-            </button>
+    <!-- شريط العنوان العلوي (على نمط غوغل) -->
+    <header class="bg-[#f0f4f9] sticky top-0 z-40 px-4 py-4 flex items-center justify-between border-b border-slate-200/60">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
+                <i class="fa-solid fa-folder-open text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-slate-800">ملفاتي</h1>
+                <p class="text-xs text-slate-500">منظم بلال الذكي</p>
+            </div>
         </div>
+        <button onclick="openNewAlbumModal()" class="bg-[#c2e7ff] hover:bg-[#b3dcff] text-[#001d35] font-semibold px-4 py-2.5 rounded-full text-xs transition-all flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-folder-plus text-sm"></i> ألبوم جديد
+        </button>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 mt-6">
-        
-        <!-- قسم إضافة ملف جديد -->
-        <section class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-5 mb-8 shadow-xl">
-            <h2 class="text-md font-semibold mb-4 text-slate-300 flex items-center gap-2">
-                <i class="fa-solid fa-file-import text-emerald-400"></i> إضافة ملف للألبوم
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- اختيار الألبوم المستهدف -->
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">اختر الألبوم</label>
-                    <select id="target-album-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500 text-slate-200">
-                        <!-- سيتم تعبئتها برمجياً -->
-                    </select>
-                </div>
-                <!-- رفع الملف -->
-                <div class="md:col-span-2">
-                    <label class="block text-xs text-slate-400 mb-1">اختر الملف (صوت، صورة، مستند)</label>
-                    <div class="flex gap-2">
-                        <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)">
-                        <button onclick="document.getElementById('file-input').click()" class="flex-1 bg-slate-900 border border-dashed border-slate-600 hover:border-emerald-500 rounded-xl py-2 px-4 text-sm text-slate-400 hover:text-emerald-400 transition-all flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <span id="file-name-display">اختر من جهازك...</span>
-                        </button>
-                        <button onclick="addFileToAlbum()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-5 rounded-xl transition-all">إضافة</button>
+    <main class="max-w-md mx-auto px-4 mt-4 space-y-6">
+
+        <!-- كارت كشف مساحة التخزين (مثل غوغل فايلز) -->
+        <section class="google-card p-5 border border-slate-100">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-slate-500">سعة التخزين المستخدمة</span>
+                <span id="storage-text" class="text-xs font-bold text-blue-600">0 ميغابايت</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div id="storage-bar" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 2%"></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 text-left">مساحة تجريبية لملفاتك المرفوعة بداخل المتصفح</p>
+        </section>
+
+        <!-- شبكة التصنيفات الرسمية (Google Files Categories) -->
+        <section>
+            <h2 class="text-xs font-bold text-slate-500 mr-2 mb-3">التصنيفات</h2>
+            <div class="grid grid-cols-4 gap-3 text-center">
+                <!-- تصنيف الصوتيات -->
+                <button onclick="filterCategory('audio')" class="category-btn flex flex-col items-center">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-1.5 shadow-sm">
+                        <i class="fa-solid fa-music text-lg"></i>
                     </div>
-                </div>
+                    <span class="text-xs font-medium text-slate-700">صوتيات</span>
+                </button>
+                <!-- تصنيف المستندات -->
+                <button onclick="filterCategory('document')" class="category-btn flex flex-col items-center">
+                    <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-1.5 shadow-sm">
+                        <i class="fa-solid fa-file-lines text-lg"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-700">مستندات</span>
+                </button>
+                <!-- تصنيف الصور -->
+                <button onclick="filterCategory('image')" class="category-btn flex flex-col items-center">
+                    <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 mb-1.5 shadow-sm">
+                        <i class="fa-solid fa-image text-lg"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-700">صور</span>
+                </button>
+                <!-- تصنيف الفيديوهات -->
+                <button onclick="filterCategory('video')" class="category-btn flex flex-col items-center">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 mb-1.5 shadow-sm">
+                        <i class="fa-solid fa-video text-lg"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-700">فيديو</span>
+                </button>
             </div>
         </section>
 
-        <!-- الألبومات والملفات -->
-        <section>
-            <h2 class="text-lg font-bold mb-4 text-slate-200 flex items-center gap-2">
-                <i class="fa-solid fa-images text-emerald-400"></i> ألبوماتك الحالية
-            </h2>
-            <div id="albums-container" class="space-y-6">
-                <!-- سيتم توليد الألبومات هنا تلقائياً -->
+        <!-- زر استيراد ملف مدمج بتجربة جميلة -->
+        <section class="google-card p-4 border border-dashed border-slate-300 hover:border-blue-400 transition-all flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-file-arrow-up text-lg"></i>
+                </div>
+                <div class="text-right">
+                    <h3 class="text-xs font-bold text-slate-800">استيراد ملف جديد</h3>
+                    <p class="text-[10px] text-slate-400">اختر ألبومك أولاً ثم أضف الملف</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <select id="target-album-select" class="bg-slate-100 text-xs font-semibold px-2 py-1.5 rounded-lg focus:outline-none text-slate-700">
+                    <!-- سيتم تعبئتها برمجياً -->
+                </select>
+                <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)">
+                <button onclick="document.getElementById('file-input').click()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-2 rounded-lg shadow-md transition-all">
+                    رفع ملف
+                </button>
             </div>
         </section>
+
+        <!-- الألبومات والملفات المخزنة -->
+        <section class="space-y-4">
+            <h2 class="text-xs font-bold text-slate-500 mr-2">مجلدات الألبومات الذكية</h2>
+            <div id="albums-container" class="space-y-4">
+                <!-- سيتم توليد الألبومات والملفات هنا تلقائياً -->
+            </div>
+        </section>
+
     </main>
 
-    <!-- نافذة منبثقة (Modal) لإنشاء ألبوم جديد -->
-    <div id="new-album-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md p-6 shadow-2xl scale-95 transition-all">
-            <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
-                <i class="fa-solid fa-folder-plus"></i> إنشاء ألبوم جديد
-            </h3>
-            <div class="mb-4">
-                <label class="block text-xs text-slate-400 mb-1">اسم الألبوم</label>
-                <input type="text" id="new-album-name" placeholder="مثال: صوتيات دكسن، ملفات سادس..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 text-slate-200">
+    <!-- 🔐 نافذة "طلب الإذن والسماح" الحقيقية والأنيقة (Permission Modal) -->
+    <div id="permission-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-6 z-50 animate-fade-in">
+        <div class="bg-white rounded-[28px] w-full max-w-xs p-6 shadow-2xl text-center transform scale-95 transition-all">
+            <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-shield-halved text-2xl"></i>
             </div>
-            <div class="flex justify-end gap-2">
-                <button onclick="closeNewAlbumModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-4 py-2 rounded-xl text-sm transition-all">إلغاء</button>
-                <button onclick="createNewAlbum()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-5 py-2 rounded-xl text-sm transition-all">إنشاء</button>
+            <h3 class="text-md font-bold text-slate-800 mb-2">طلب إذن استيراد ملف</h3>
+            <p id="permission-text" class="text-xs text-slate-500 leading-relaxed mb-6">هل تسمح لتطبيق ملفاتي باستيراد وحفظ هذا الملف بداخل ألبومك المخصص بشكل آمن؟</p>
+            <div class="flex gap-2 justify-center">
+                <button onclick="denyPermission()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2.5 rounded-full text-xs transition-all">
+                    رفض
+                </button>
+                <button onclick="allowPermission()" class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-full text-xs transition-all shadow-md">
+                    سماح (Allow)
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- جافا سكريبت لتشغيل التطبيق بالكامل بشكل تفاعلي -->
+    <!-- نافذة منبثقة لإنشاء ألبوم جديد -->
+    <div id="new-album-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-[28px] w-full max-w-xs p-6 shadow-2xl">
+            <h3 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-folder-plus text-blue-600"></i> إنشاء ألبوم مخصص
+            </h3>
+            <input type="text" id="new-album-name" placeholder="اسم الألبوم (مثل: صوتيات دكسن)" class="w-full bg-slate-100 border-none rounded-xl px-4 py-3 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 mb-4">
+            <div class="flex gap-2">
+                <button onclick="closeNewAlbumModal()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-2.5 rounded-full text-xs transition-all">إلغاء</button>
+                <button onclick="createNewAlbum()" class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-full text-xs transition-all shadow-md">إنشاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- جافا سكريبت للتشغيل والتفاعل والـ LocalStorage لحفظ البيانات -->
     <script>
-        // الألبومات الافتراضية عند تشغيل التطبيق أول مرة
-        let albums = {
-            "الملفات العامة": [],
-            "صوتيات وموسيقى": [],
-            "المستندات الهامة": []
+        // تحميل الألبومات المخزنة في المتصفح أو إنشاء افتراضية
+        let albums = JSON.parse(localStorage.getItem('bilal_albums')) || {
+            "صوتيات عامة": [],
+            "ملفات سادس علمي": [],
+            "صور ومستندات دكسن": []
         };
 
         let tempSelectedFile = null;
 
-        // لتحديث القوائم وعرض البيانات
-        function updateUI() {
+        // تحديث واجهة الاستخدام بالكامل
+        function updateUI(filterType = 'all') {
             const container = document.getElementById('albums-container');
             const select = document.getElementById('target-album-select');
             
             container.innerHTML = '';
             select.innerHTML = '';
 
-            // إذا لم تكن هناك ألبومات
-            if (Object.keys(albums).length === 0) {
-                container.innerHTML = `<p class="text-slate-500 text-center py-10">لا توجد ألبومات حالياً. اضغط على ألبوم جديد للبدء!</p>`;
-                return;
-            }
+            let totalFilesSize = 0;
 
             for (const [albumName, files] of Object.entries(albums)) {
                 // تعبئة قائمة الاختيار لشاشة الإضافة
@@ -121,53 +187,70 @@
                 option.textContent = albumName;
                 select.appendChild(option);
 
-                // بناء واجهة الألبوم
+                // تصفية الملفات حسب نوعها إذا تم الضغط على أيقونات التصنيف
+                let filteredFiles = files;
+                if (filterType !== 'all') {
+                    filteredFiles = files.filter(f => f.category === filterType);
+                }
+
+                // حساب حجم الملفات الإجمالي تقريبياً
+                files.forEach(f => {
+                    totalFilesSize += (f.data.length * 0.75) / (1024 * 1024); // حساب الميغابايت من base64
+                });
+
+                // بناء واجهة مجلد الألبوم على نمط غوغل
                 const albumCard = document.createElement('div');
-                albumCard.className = 'bg-slate-800/30 border border-slate-700/40 rounded-2xl p-5 shadow-lg';
+                albumCard.className = 'google-card p-4 border border-slate-100';
                 
                 let filesHTML = '';
-                if (files.length === 0) {
-                    filesHTML = `<p class="text-slate-500 text-sm py-4 text-center">هذا الألبوم فارغ حالياً.</p>`;
+                if (filteredFiles.length === 0) {
+                    filesHTML = `<p class="text-slate-400 text-[11px] py-3 text-center">فارغ حالياً أو لا تتوفر ملفات بهذا التصنيف.</p>`;
                 } else {
-                    filesHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">`;
-                    files.forEach((file, index) => {
+                    filesHTML = `<div class="space-y-3 mt-3">`;
+                    filteredFiles.forEach((file, index) => {
                         let mediaElement = '';
-                        let icon = '<i class="fa-solid fa-file-invoice text-slate-400 text-lg"></i>';
+                        let icon = '<i class="fa-solid fa-file-lines text-slate-400 text-md"></i>';
+                        let iconBg = 'bg-slate-100';
 
-                        // إذا كان الملف صورة
-                        if (file.type.startsWith('image/')) {
-                            mediaElement = `<img src="${file.data}" class="w-full h-32 object-cover rounded-lg mb-2 shadow">`;
-                            icon = '<i class="fa-solid fa-image text-emerald-400 text-lg"></i>';
-                        } 
-                        // إذا كان الملف صوتي
-                        else if (file.type.startsWith('audio/')) {
+                        if (file.category === 'image') {
+                            mediaElement = `<img src="${file.data}" class="w-full h-28 object-cover rounded-2xl mb-2.5 shadow-sm">`;
+                            icon = '<i class="fa-solid fa-image text-amber-600"></i>';
+                            iconBg = 'bg-amber-100';
+                        } else if (file.category === 'audio') {
                             mediaElement = `
-                                <div class="bg-slate-900/80 p-2 rounded-lg mb-2">
-                                    <audio controls class="w-full h-8 accent-emerald-500">
+                                <div class="bg-slate-50 p-2 rounded-xl mb-2 border border-slate-100">
+                                    <audio controls class="w-full h-8 accent-blue-600">
                                         <source src="${file.data}" type="${file.type}">
                                     </audio>
                                 </div>`;
-                            icon = '<i class="fa-solid fa-music text-blue-400 text-lg"></i>';
-                        }
-                        // ملفات أخرى (PDF, Word)
-                        else if (file.name.endsWith('.pdf')) {
-                            icon = '<i class="fa-solid fa-file-pdf text-red-500 text-lg"></i>';
-                        } else if (file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
-                            icon = '<i class="fa-solid fa-file-word text-blue-500 text-lg"></i>';
-                        } else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
-                            icon = '<i class="fa-solid fa-file-excel text-emerald-500 text-lg"></i>';
+                            icon = '<i class="fa-solid fa-music text-blue-600"></i>';
+                            iconBg = 'bg-blue-100';
+                        } else if (file.category === 'video') {
+                            mediaElement = `
+                                <div class="bg-slate-50 p-1 rounded-xl mb-2 border border-slate-100">
+                                    <video controls class="w-full h-32 rounded-lg">
+                                        <source src="${file.data}" type="${file.type}">
+                                    </video>
+                                </div>`;
+                            icon = '<i class="fa-solid fa-video text-red-600"></i>';
+                            iconBg = 'bg-red-100';
+                        } else if (file.name.endsWith('.pdf')) {
+                            icon = '<i class="fa-solid fa-file-pdf text-red-600"></i>';
+                            iconBg = 'bg-red-50';
                         }
 
                         filesHTML += `
-                            <div class="bg-slate-900/50 border border-slate-800 p-3 rounded-xl flex flex-col justify-between hover:border-slate-700 transition-all">
+                            <div class="bg-slate-50/60 border border-slate-100/80 p-2.5 rounded-2xl flex flex-col justify-between hover:border-slate-200 transition-all">
                                 ${mediaElement}
-                                <div class="flex items-center justify-between gap-2 mt-1">
-                                    <div class="flex items-center gap-2 overflow-hidden">
-                                        ${icon}
-                                        <span class="text-xs text-slate-300 truncate font-medium" title="${file.name}">${file.name}</span>
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2.5 overflow-hidden">
+                                        <div class="w-8 h-8 rounded-full ${iconBg} flex items-center justify-center shrink-0">
+                                            ${icon}
+                                        </div>
+                                        <span class="text-xs text-slate-700 truncate font-semibold" title="${file.name}">${file.name}</span>
                                     </div>
-                                    <button onclick="deleteFile('${albumName}', ${index})" class="text-slate-500 hover:text-red-400 p-1 rounded-lg transition-all" title="حذف الملف">
-                                        <i class="fa-solid fa-trash-can text-sm"></i>
+                                    <button onclick="deleteFile('${albumName}', ${index})" class="text-slate-400 hover:text-red-500 p-1 transition-all">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
                                     </button>
                                 </div>
                             </div>
@@ -177,108 +260,140 @@
                 }
 
                 albumCard.innerHTML = `
-                    <div class="flex justify-between items-center border-b border-slate-700/50 pb-3">
-                        <h3 class="font-bold text-slate-200 flex items-center gap-2">
-                            <i class="fa-solid fa-folder-open text-amber-400"></i>
-                            <span>${albumName}</span>
-                            <span class="text-xs bg-slate-700 text-slate-300 px-2.5 py-0.5 rounded-full">${files.length} ملف</span>
-                        </h3>
-                        <button onclick="deleteAlbum('${albumName}')" class="text-slate-500 hover:text-red-400 transition-all text-sm flex items-center gap-1">
-                            <i class="fa-solid fa-folder-minus"></i> حذف الألبوم
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-folder text-amber-500 text-md"></i>
+                            <span class="font-bold text-xs text-slate-800">${albumName}</span>
+                            <span class="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-bold">${files.length}</span>
+                        </div>
+                        <button onclick="deleteAlbum('${albumName}')" class="text-slate-400 hover:text-red-500 transition-all text-[10px] flex items-center gap-1">
+                            <i class="fa-solid fa-trash text-[9px]"></i> حذف
                         </button>
                     </div>
                     ${filesHTML}
                 `;
                 container.appendChild(albumCard);
             }
+
+            // تحديث كارت الذاكرة
+            const sizeMB = totalFilesSize.toFixed(2);
+            document.getElementById('storage-text').textContent = `${sizeMB} ميغابايت`;
+            const barWidth = Math.min((totalFilesSize / 50) * 100, 100); // حد افتراضي 50 ميغابايت للذاكرة المحلية
+            document.getElementById('storage-bar').style.width = `${barWidth + 2}%`;
         }
 
-        // فتح وإغلاق النافذة المنبثقة للألبوم الجديد
+        // إظهار وإخفاء النوافذ المنبثقة
         function openNewAlbumModal() {
-            const modal = document.getElementById('new-album-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            document.getElementById('new-album-modal').classList.remove('hidden');
+            document.getElementById('new-album-modal').classList.add('flex');
         }
 
         function closeNewAlbumModal() {
-            const modal = document.getElementById('new-album-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            document.getElementById('new-album-modal').classList.add('hidden');
+            document.getElementById('new-album-modal').classList.remove('flex');
             document.getElementById('new-album-name').value = '';
         }
 
-        // إنشاء ألبوم مخصص جديد
+        // إنشاء ألبوم جديد
         function createNewAlbum() {
-            const nameInput = document.getElementById('new-album-name');
-            const name = nameInput.getClientRects ? nameInput.value.trim() : "";
             const albumName = document.getElementById('new-album-name').value.trim();
-            if (!albumName) {
-                alert("الرجاء إدخال اسم الألبوم!");
-                return;
-            }
+            if (!albumName) return;
             if (albums[albumName]) {
-                alert("هذا الألبوم موجود بالفعل!");
+                alert("هذا المجلد موجود بالفعل!");
                 return;
             }
             albums[albumName] = [];
+            saveData();
             updateUI();
             closeNewAlbumModal();
         }
 
+        // تصفية الملفات حسب فئتها عند الضغط على الأزرار العلوية
+        function filterCategory(type) {
+            updateUI(type);
+        }
+
         // حذف ألبوم بالكامل
         function deleteAlbum(albumName) {
-            if (confirm(`هل أنت متأكد من حذف ألبوم "${albumName}" بجميع ملفاته؟`)) {
+            if (confirm(`هل أنت متأكد من حذف المجلد "${albumName}"؟`)) {
                 delete albums[albumName];
+                saveData();
                 updateUI();
             }
         }
 
-        // معالجة اختيار الملف
+        // التعامل مع اختيار الملف لإظهار الـ "سماح"
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
+
+            // تحديد نوع الفئة برمجياً
+            let category = 'document';
+            if (file.type.startsWith('image/')) category = 'image';
+            else if (file.type.startsWith('audio/')) category = 'audio';
+            else if (file.type.startsWith('video/')) category = 'video';
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 tempSelectedFile = {
                     name: file.name,
                     type: file.type,
-                    data: e.target.result // محتوى الملف مشفر كـ base64 لتشغيله أو عرضه
+                    category: category,
+                    data: e.target.result
                 };
-                document.getElementById('file-name-display').textContent = file.name;
-                document.getElementById('file-name-display').classList.remove('text-slate-400');
-                document.getElementById('file-name-display').classList.add('text-emerald-400', 'font-semibold');
+                
+                // تحديث نص نافذة السماح وعرضها
+                document.getElementById('permission-text').innerHTML = `هل تسمح لتطبيق ملفاتي باستيراد وحفظ الملف <br><strong class="text-blue-600">${file.name}</strong><br> بداخل ألبومك المخصص بشكل آمن؟`;
+                openPermissionModal();
             };
             reader.readAsDataURL(file);
         }
 
-        // إضافة الملف للألبوم المختار يدوياً
-        function addFileToAlbum() {
-            const targetAlbum = document.getElementById('target-album-select').value;
-            if (!tempSelectedFile) {
-                alert("الرجاء اختيار ملف أولاً من جهازك!");
-                return;
-            }
-            if (!targetAlbum) {
-                alert("يرجى اختيار ألبوم، أو إنشاء ألبوم جديد أولاً!");
-                return;
-            }
-
-            albums[targetAlbum].push(tempSelectedFile);
-            tempSelectedFile = null;
-            document.getElementById('file-name-display').textContent = "اختر من جهازك...";
-            document.getElementById('file-name-display').className = "text-slate-400";
-            document.getElementById('file-input').value = '';
-            updateUI();
+        // نافذة السماح
+        function openPermissionModal() {
+            const modal = document.getElementById('permission-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
-        // حذف ملف من الألبوم
+        function closePermissionModal() {
+            const modal = document.getElementById('permission-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('file-input').value = '';
+        }
+
+        // إذا ضغط المستخدم على "سماح"
+        function allowPermission() {
+            const targetAlbum = document.getElementById('target-album-select').value;
+            if (tempSelectedFile && targetAlbum) {
+                albums[targetAlbum].push(tempSelectedFile);
+                tempSelectedFile = null;
+                saveData();
+                updateUI();
+                closePermissionModal();
+            }
+        }
+
+        // إذا ضغط المستخدم على "رفض"
+        function denyPermission() {
+            tempSelectedFile = null;
+            closePermissionModal();
+        }
+
+        // حذف ملف واحد
         function deleteFile(albumName, index) {
             albums[albumName].splice(index, 1);
+            saveData();
             updateUI();
         }
 
-        // تشغيل الواجهة الافتراضية
+        // حفظ البيانات في ذاكرة المتصفح للعودة إليها دائماً
+        function saveData() {
+            localStorage.setItem('bilal_albums', JSON.stringify(albums));
+        }
+
+        // تشغيل واجهة الاستخدام لأول مرة
         updateUI();
     </script>
 </body>
